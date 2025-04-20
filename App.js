@@ -6,6 +6,7 @@ import { saveTasks, loadTasks } from './utils/storage';
 
 export default function App() {
   const [tasks, setTasks] = useState([]);
+  const [editingTask, setEditingTask] = useState(null); // Nuevo estado
 
   useEffect(() => {
     (async () => {
@@ -39,15 +40,35 @@ export default function App() {
     setTasks(tasks.filter((t) => t.id !== id));
   };
 
+  const startEditing = (task) => {
+    setEditingTask(task);
+  };
+
+  const saveEdit = (newTitle) => {
+    setTasks(tasks.map(t =>
+      t.id === editingTask.id ? { ...t, title: newTitle } : t
+    ));
+    setEditingTask(null);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>📋 Lista de Tareas</Text>
-      <TaskInput onAdd={addTask} />
+      <TaskInput
+        onAdd={addTask}
+        onEdit={saveEdit}
+        editingTask={editingTask}
+      />
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TaskItem task={item} onToggle={toggleTask} onDelete={deleteTask} />
+          <TaskItem
+            task={item}
+            onToggle={toggleTask}
+            onDelete={deleteTask}
+            onEdit={startEditing} 
+          />
         )}
       />
     </View>

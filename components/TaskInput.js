@@ -1,13 +1,24 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 
-export default function TaskInput({ onAdd }) {
+export default function TaskInput({ onAdd, onEdit, editingTask }) {
   const [text, setText] = useState('');
 
-  const handleAdd = () => {
+  useEffect(() => {
+    if (editingTask) {
+      setText(editingTask.title);
+    } else {
+      setText('');
+    }
+  }, [editingTask]);
+
+  const handleSubmit = () => {
     if (text.trim()) {
-      onAdd(text.trim());
+      if (editingTask) {
+        onEdit(text.trim());
+      } else {
+        onAdd(text.trim());
+      }
       setText('');
     }
   };
@@ -16,12 +27,11 @@ export default function TaskInput({ onAdd }) {
     <View style={styles.container}>
       <TextInput
         placeholder="Nueva tarea"
-        placeholderTextColor="#888" 
         style={styles.input}
         value={text}
         onChangeText={setText}
       />
-      <Button title="Agregar" onPress={handleAdd} />
+      <Button title={editingTask ? "Guardar" : "Agregar"} onPress={handleSubmit} />
     </View>
   );
 }
@@ -34,10 +44,10 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    color: 'black',           
-    backgroundColor: 'white',  
+    borderColor: '#ccc',
+    color: 'black',
     padding: 10,
     marginRight: 8,
     borderRadius: 6,
-  },  
+  },
 });
